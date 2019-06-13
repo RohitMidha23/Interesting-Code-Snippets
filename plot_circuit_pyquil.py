@@ -1,3 +1,5 @@
+# This specific file is for quantum circuits implemented with pyQuil
+# Their Forest SDK doesn't have a visualisation for circuits as yet, hence the code
 from pyquil import Program
 from pyquil.gates import H
 from pyquil.latex import to_latex
