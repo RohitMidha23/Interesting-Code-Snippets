@@ -17,3 +17,6 @@ def plot_complex(a):
 
 x = 2.3 - 14j
 plot_complex([x])
+
+# To plot conjugate
+plot_complex([x.conjugate()])
