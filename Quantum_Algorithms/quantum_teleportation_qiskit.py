@@ -11,7 +11,6 @@ def make_bell_pair(circuit,q1,q2):
     circuit.cx(q1,q2)
 
 
-coupling_map = [[0, 1], [0, 2], [1, 2], [3, 2], [3, 4], [4, 2]]
 backend = BasicAer.get_backend("qasm_simulator")
 
 
