@@ -44,3 +44,21 @@ def getCofactors(m):
       minor = getMatrixMinor(m,i,j)
       cofactors[i,j] = ((-1) ** (i+j)) * getMatrixDeterminant(minor)
   return cofactors
+
+
+def getMatrixInverse(m):
+
+  determinant = getMatrixDeterminant(m)
+  if(len(m)==2):
+    return [
+        [m[1,1] / determinant, -1 * m[0,1] / determinant],
+        [-1 * m[1,0] / determinant, m[0,0] / determinant]
+    ]
+  cofactors = getCofactors(m)
+  cofactors = np.matrix.transpose(cofactors)
+
+  for i in range(len(cofactors)):
+    for j in range(len(cofactors)):
+      cofactors[i,j] = cofactors[i,j] / determinant
+
+  return cofactors
