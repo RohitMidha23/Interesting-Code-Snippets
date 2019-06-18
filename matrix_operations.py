@@ -26,3 +26,13 @@ def getMatrixMinor(m,r,c):
       p=p-1
 
   return a
+
+def getMatrixDeterminant(m):
+  if len(m)==2:
+    determinant = quantumDeterminant(m)
+    return determinant
+  else:
+    determinant = 0
+    for c in range(len(m)):
+      determinant += ((-1)**c) * m[0,c] * getMatrixDeterminant(getMatrixMinor(m,0,c))
+    return determinant
