@@ -29,7 +29,7 @@ def getMatrixMinor(m,r,c):
 
 def getMatrixDeterminant(m):
   if len(m)==2:
-    determinant = quantumDeterminant(m)
+    determinant = m[0,0] * m[1,1] - m[0,1] * m[1,0]
     return determinant
   else:
     determinant = 0
