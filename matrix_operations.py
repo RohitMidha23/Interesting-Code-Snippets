@@ -36,3 +36,11 @@ def getMatrixDeterminant(m):
     for c in range(len(m)):
       determinant += ((-1)**c) * m[0,c] * getMatrixDeterminant(getMatrixMinor(m,0,c))
     return determinant
+
+def getCofactors(m):
+  cofactors = np.zeros([len(m),len(m)])
+  for i in range(len(m)):
+    for j in range(len(m)):
+      minor = getMatrixMinor(m,i,j)
+      cofactors[i,j] = ((-1) ** (i+j)) * getMatrixDeterminant(minor)
+  return cofactors
