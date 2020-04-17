@@ -3,7 +3,6 @@ author: RohitMidha23
 description: A simple code to convert annotations from VOC format to COCO Format.
 """
 
-
 import os
 import xml.etree.ElementTree as ET
 import xmltodict
@@ -16,18 +15,21 @@ def generateVOC2Json(rootDir, xmlFiles):
     attrDict = dict()
     # List your classes here
     attrDict["categories"] = [
-        {"supercategory": "none", "id": 1, "name": "1"},
-        {"supercategory": "none", "id": 2, "name": "auto"},
-        {"supercategory": "none", "id": 3, "name": "bus"},
-        {"supercategory": "none", "id": 4, "name": "truck"},
-        {"supercategory": "none", "id": 5, "name": "car"},
+        {"supercategory": "none", "id": 1, "name": "1"}
+        # {"supercategory": "none", "id": 1, "name": "bike"},
+        # {"supercategory": "none", "id": 2, "name": "auto"},
+        # {"supercategory": "none", "id": 3, "name": "bus"},
+        # {"supercategory": "none", "id": 4, "name": "truck"},
+        # {"supercategory": "none", "id": 5, "name": "car"},
     ]
     images = list()
     annotations = list()
     for root, dirs, files in os.walk(rootDir):
         image_id = 0
+        id1 = 0
         for file in xmlFiles:
             image_id = image_id + 1
+            id1 = id1 + 1
             if file in files:
                 annotation_path = os.path.abspath(os.path.join(root, file))
                 image = dict()
@@ -38,7 +40,7 @@ def generateVOC2Json(rootDir, xmlFiles):
                 image["id"] = image_id
                 print("[INFO]File Name: {} and image_id {}".format(file, image_id))
                 images.append(image)
-                id1 = 1
+
                 if "object" in doc["annotation"]:
                     for obj in doc["annotation"]["object"]:
                         for value in attrDict["categories"]:
@@ -82,8 +84,9 @@ def generateVOC2Json(rootDir, xmlFiles):
     attrDict["annotations"] = annotations
     attrDict["type"] = "instances"
 
+    # print attrDict
     jsonString = json.dumps(attrDict)
-    with open("train.json", "w") as f:
+    with open("train_single.json", "w") as f:
         f.write(jsonString)
 
 
