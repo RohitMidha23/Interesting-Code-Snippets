@@ -3,6 +3,7 @@ author: RohitMidha23
 description: A simple code to convert annotations from VOC format to COCO Format.
 """
 
+
 import os
 import xml.etree.ElementTree as ET
 import xmltodict
@@ -10,17 +11,45 @@ import json
 from xml.dom import minidom
 from collections import OrderedDict
 
+def generateAnnotation(obj, attrDict, image_id, id1):
+    anns = []
+    for value in attrDict["categories"]:
+        annotation = dict()
+        if str(obj["name"]) == value["name"]:
+            annotation["iscrowd"] = 0
+            annotation["image_id"] = image_id
+            x1 = int(obj["bndbox"]["xmin"]) - 1
+            y1 = int(obj["bndbox"]["ymin"]) - 1
+            x2 = int(obj["bndbox"]["xmax"]) - x1
+            y2 = int(obj["bndbox"]["ymax"]) - y1
+            annotation["bbox"] = [x1, y1, x2, y2]
+            annotation["area"] = float(x2 * y2)
+            annotation["category_id"] = value["id"]
+            annotation["ignore"] = 0
+            annotation["id"] = id1
+            annotation["segmentation"] = [
+                [
+                    x1,
+                    y1,
+                    x1,
+                    (y1 + y2),
+                    (x1 + x2),
+                    (y1 + y2),
+                    (x1 + x2),
+                    y1,
+                ]
+            ]
+            id1 += 1
+            anns.append(annotation)
+    return anns
+
+
 
 def generateVOC2Json(rootDir, xmlFiles):
     attrDict = dict()
     # List your classes here
     attrDict["categories"] = [
-        {"supercategory": "none", "id": 1, "name": "1"}
-        # {"supercategory": "none", "id": 1, "name": "bike"},
-        # {"supercategory": "none", "id": 2, "name": "auto"},
-        # {"supercategory": "none", "id": 3, "name": "bus"},
-        # {"supercategory": "none", "id": 4, "name": "truck"},
-        # {"supercategory": "none", "id": 5, "name": "car"},
+        {"supercategory": "none", "id": 1, "name": "mask"}
     ]
     images = list()
     annotations = list()
@@ -42,37 +71,15 @@ def generateVOC2Json(rootDir, xmlFiles):
                 images.append(image)
 
                 if "object" in doc["annotation"]:
-                    for obj in doc["annotation"]["object"]:
-                        for value in attrDict["categories"]:
-                            annotation = dict()
-
-                            if str(obj["name"]) == value["name"]:
-                                annotation["iscrowd"] = 0
-                                annotation["image_id"] = image_id
-                                x1 = int(obj["bndbox"]["xmin"]) - 1
-                                y1 = int(obj["bndbox"]["ymin"]) - 1
-                                x2 = int(obj["bndbox"]["xmax"]) - x1
-                                y2 = int(obj["bndbox"]["ymax"]) - y1
-                                annotation["bbox"] = [x1, y1, x2, y2]
-                                annotation["area"] = float(x2 * y2)
-                                annotation["category_id"] = value["id"]
-                                annotation["ignore"] = 0
-                                annotation["id"] = id1
-                                annotation["segmentation"] = [
-                                    [
-                                        x1,
-                                        y1,
-                                        x1,
-                                        (y1 + y2),
-                                        (x1 + x2),
-                                        (y1 + y2),
-                                        (x1 + x2),
-                                        y1,
-                                    ]
-                                ]
-                                id1 += 1
-
-                                annotations.append(annotation)
+                    x = list(doc["annotation"]["object"])
+                    if len(x[0])==4:
+                        # print("ONE")
+                        obj = doc["annotation"]["object"]
+                        annotations.extend(generateAnnotation(obj, attrDict, image_id, id1))
+                    else:
+                        for obj in doc["annotation"]["object"]:
+                            # print("MORE")
+                            annotations.extend(generateAnnotation(obj, attrDict, image_id, id1))
 
                 else:
                     print("[INFO]File: {} doesn't have any object".format(file))
@@ -86,7 +93,7 @@ def generateVOC2Json(rootDir, xmlFiles):
 
     # print attrDict
     jsonString = json.dumps(attrDict)
-    with open("train_single.json", "w") as f:
+    with open("train.json", "w") as f:
         f.write(jsonString)
 
 
@@ -96,10 +103,10 @@ with open(trainFile, "rb") as f:
     for line in f:
         fileName = line.strip()
         fileName = str(fileName, "utf-8")
-        fileName = fileName.strip(".jpg")
+        fileName = fileName.split(".")[0]
         print("[INFO]Filename: ", fileName)
         trainXMLFiles.append(fileName + ".xml")
 
 
-rootDir = "train_xmls/"
+rootDir = "annotations_xml/"
 generateVOC2Json(rootDir, trainXMLFiles)
