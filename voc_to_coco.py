@@ -41,7 +41,7 @@ def generateAnnotation(obj, attrDict, image_id, id1):
             ]
             id1 += 1
             anns.append(annotation)
-    return anns
+    return anns, id1
 
 
 
@@ -73,13 +73,15 @@ def generateVOC2Json(rootDir, xmlFiles):
                 if "object" in doc["annotation"]:
                     x = list(doc["annotation"]["object"])
                     if len(x[0])==4:
-                        # print("ONE")
                         obj = doc["annotation"]["object"]
-                        annotations.extend(generateAnnotation(obj, attrDict, image_id, id1))
+                        l, nid = generateAnnotation(obj, attrDict, image_id, id1)
+                        annotations.extend(l)
+                        id1 = nid
                     else:
                         for obj in doc["annotation"]["object"]:
-                            # print("MORE")
-                            annotations.extend(generateAnnotation(obj, attrDict, image_id, id1))
+                            l, nid = generateAnnotation(obj, attrDict, image_id, id1)
+                            annotations.extend(l)
+                            id1 = nid
 
                 else:
                     print("[INFO]File: {} doesn't have any object".format(file))
@@ -93,11 +95,11 @@ def generateVOC2Json(rootDir, xmlFiles):
 
     # print attrDict
     jsonString = json.dumps(attrDict)
-    with open("train.json", "w") as f:
+    with open("test.json", "w") as f:
         f.write(jsonString)
 
 
-trainFile = "train.txt"
+trainFile = "test.txt"
 trainXMLFiles = list()
 with open(trainFile, "rb") as f:
     for line in f:
@@ -108,5 +110,5 @@ with open(trainFile, "rb") as f:
         trainXMLFiles.append(fileName + ".xml")
 
 
-rootDir = "annotations_xml/"
+rootDir = "test_VOC_annotations/"
 generateVOC2Json(rootDir, trainXMLFiles)
