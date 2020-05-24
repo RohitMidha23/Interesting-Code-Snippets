@@ -49,16 +49,18 @@ def generateVOC2Json(rootDir, xmlFiles):
     attrDict = dict()
     # List your classes here
     attrDict["categories"] = [
-        {"supercategory": "none", "id": 1, "name": "mask"}
+        {"supercategory": "none", "id": 1, "name": "mask"},
+        {"supercategory": "none", "id": 2, "name": "no_mask"}
+
     ]
     images = list()
     annotations = list()
     for root, dirs, files in os.walk(rootDir):
         image_id = 0
-        id1 = 0
+        id1 = 1
         for file in xmlFiles:
             image_id = image_id + 1
-            id1 = id1 + 1
+            # id1 = id1 + 1
             if file in files:
                 annotation_path = os.path.abspath(os.path.join(root, file))
                 image = dict()
@@ -110,5 +112,5 @@ with open(trainFile, "rb") as f:
         trainXMLFiles.append(fileName + ".xml")
 
 
-rootDir = "test_VOC_annotations/"
+rootDir = "test_xml/"
 generateVOC2Json(rootDir, trainXMLFiles)
